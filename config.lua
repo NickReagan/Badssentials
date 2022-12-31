@@ -97,6 +97,7 @@ Config = {
         Peacetime = "peacetime", -- Peacetime & PT both control the peacetime system.
         PT = "pt",
         PeacetimeAcePermission = "Badssentials.PeaceTime", --The ace permission required to run PT or Peacetime command.
+        usingLegacyFuel = true, --Whether or not to enable the {FUEL} placeholder. (MUST HAVE LegacyFuel INSTALLED!)
     },
     Displays = {
 		['Noir RP Server | Discord'] = {
@@ -104,6 +105,7 @@ Config = {
 			y = .01,
 			display = "~g~Noir RP ~w~| discord.gg/BB68c3d",
 			textScale = .55,
+            vehicleRestricted = false,
 			enabled = true
 		},
 		['Compass Location'] = {
@@ -111,6 +113,7 @@ Config = {
 			y = .85,
 			display = "~w~| ~g~{COMPASS} ~w~|",
 			textScale = 1.0,
+            vehicleRestricted = false,
 			enabled = true
 		},
 		['Street Location'] = {
@@ -118,6 +121,7 @@ Config = {
 			y = .855,
 			display = "~g~{STREET_NAME}",
 			textScale = .45,
+            vehicleRestricted = false,
 			enabled = true
 		},
 		['City Location'] = {
@@ -125,6 +129,7 @@ Config = {
 			y = .875,
 			display = "~w~{CITY}",
 			textScale = .45,
+            vehicleRestricted = false,
 			enabled = true
 		},
 		['Nearest Postal'] = {
@@ -132,6 +137,7 @@ Config = {
 			y = .91,
 			display = "~w~Nearest ~g~Postal: ~w~{NEAREST_POSTAL} (~w~{NEAREST_POSTAL_DISTANCE}m~w~)",
 			textScale = .4,
+            vehicleRestricted = false,
 			enabled = true
 		},
 		['Time & Date'] = {
@@ -139,6 +145,7 @@ Config = {
 			y = .93,
 			display = "~g~Time (EST): ~w~{EST_TIME} ~g~| Date: ~w~{US_MONTH}~g~/~w~{US_DAY}~g~/~w~{US_YEAR}",
 			textScale = .4,
+            vehicleRestricted = false,
 			enabled = true
 		},
 		['AOP & PeaceTime'] = {
@@ -146,6 +153,7 @@ Config = {
 			y = .95,
 			display = "~w~Current ~g~AOP: {CURRENT_AOP} ~g~| ~w~PeaceTime: {PEACETIME_STATUS}",
 			textScale = .4,
+            vehicleRestricted = false,
 			enabled = true
 		},
         ['Player ID'] = {
@@ -153,6 +161,15 @@ Config = {
             y = .935,
             display = "~b~ID:~w~ {ID}",
             textScale = .45,
+            vehicleRestricted = false,
+            enabled = true
+        },
+        ['Speed & Fuel'] = {
+            x = .0445,
+            y = .77,
+            display = "~w~{SPEED_MPH} ~b~MPH ~w~| ~b~Fuel: ~w~{FUEL}",
+            textScale = .6,
+            vehicleRestricted = true,
             enabled = true
         },
     }

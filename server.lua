@@ -97,7 +97,7 @@ RegisterCommand(Config.AOPSystem.AOPCommand, function(source, args, rawCommand)
       sendMsg(src, "You have set the AOP to: " .. currentAOP);
       TriggerClientEvent('Badssentials:SetAOP', -1, currentAOP);
 
-      if Config.AOPSystem.aopAnnouncement ~= nil then
+      if Config.AOPSystem.AOP_Announcement ~= nil then
         local aopAnnouncement = Config.AOPSystem.AOP_Announcement
         aopAnnouncement = aopAnnouncement:gsub("{NEW_AOP}", currentAOP)
 
