@@ -9,7 +9,8 @@ server_script "server.lua"
 
 shared_scripts {
     "config.lua",
-    "postals.lua"
+    "postals.lua",
+    "functions.lua",
 }
 
 exports {

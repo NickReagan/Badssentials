@@ -12,35 +12,22 @@ end
 --@desc Checks if a passed ID is an online player
 --@param playerID The ID you want to check.
 function IsPlayerOnline(playerID)
-  local playerFound = false
-
   for _, ID in pairs(GetPlayers()) do
     if tonumber(ID) == tonumber(playerID) then
-      playerFound = true
+      return true
     end
   end
 
-  if playerFound then
-    return true
-  else
-    return false
-  end
+  --Player not found
+  return false
 end
 
--- @desc Check if value is an integer
--- @param number the variable you want to check 
-function IsInt(number)
-  if number == tostring(tonumber(number)) then
-      return true
-  else
-      return false
-  end
-end
-
+--export
 function GetAOP()
   return currentAOP
 end
 
+--export
 function GetPeaceTimeStatus()
   return peacetime
 end
@@ -48,6 +35,10 @@ end
 --Makes sure resource name is 'Badssentials' so any scripts using exports won't throw errors.
 if GetCurrentResourceName() ~= "Badssentials" then
   print("[" .. GetCurrentResourceName() .. "] ^3WARNING: This resource needs to be named '^0Badssentials^3' in order for everything to function correctly! Please change this resource's name back to '^0Badssentials^3'!")
+end
+
+if Config.Misc.usingLegacyFuel and (GetResourceState("LegacyFuel") ~= 'started' or 'starting') then
+  print("[" .. GetCurrentResourceName() .. "] ^3WARNING: `^0usingLegacyFuel = true^3` but LegacyFuel could not be found! Make sure LegacyFuel is installed, started, and named '^0LegacyFuel^3!")
 end
 
 RegisterCommand(Config.ScreenAffects.AnnounceCommand, function(source, args, raw) 
@@ -66,21 +57,26 @@ Citizen.CreateThread(function()
     Wait(1000);
     TriggerClientEvent('Badssentials:SetAOP', -1, currentAOP);
     TriggerClientEvent('Badssentials:SetPT', -1, peacetime);
-    local time = format_time(os.time(), "%H:%M", "+01:00", "EST");
-    local date = format_time(os.time(), "%m %d %Y", "+01:00", "EST");
+
+    local time = format_time(os.time(), "%H:%M", "+05:00", "");
+    local date = format_time(os.time(), "%m %d %Y", "local", "");
     local timeHour = split(time, ":")[1]
     local dateData = split(date, " ");
+
     TriggerClientEvent('Badssentials:SetMonth', -1, dateData[1])
     TriggerClientEvent('Badssentials:SetDay', -1, dateData[2])
     TriggerClientEvent('Badssentials:SetYear', -1, dateData[3])
+
     if tonumber(timeHour) > 12 then 
       local timeStr = tostring(tonumber(timeHour) - 12) .. ":" .. split(time, ":")[2]
       TriggerClientEvent('Badssentials:SetTime', -1, timeStr);
     end
+
     if timeHour == "00" then 
       local timeStr = "12" .. ":" .. split(time, ":")[2]
       TriggerClientEvent('Badssentials:SetTime', -1, timeStr);
     end 
+
     if timeHour ~= "00" and tonumber(timeHour) <= 12 then 
       TriggerClientEvent('Badssentials:SetTime', -1, time);
     end
@@ -88,6 +84,15 @@ Citizen.CreateThread(function()
 end)
 peacetime = false;
 currentAOP = Config.AOPSystem.DefaultAOP; -- By default 
+
+--Sets Map Name on resource start
+if Config.AOPSystem.SetMapNameAsAOP then
+  Citizen.CreateThread(function()
+    Wait(1500) 
+    SetMapName(currentAOP)
+  end)
+end
+
 RegisterCommand(Config.AOPSystem.AOPCommand, function(source, args, rawCommand)
   local src = source;
   if IsPlayerAceAllowed(src, Config.AOPSystem.AOP_AcePermission) then 
@@ -96,6 +101,10 @@ RegisterCommand(Config.AOPSystem.AOPCommand, function(source, args, rawCommand)
       currentAOP = table.concat(args, " ");
       sendMsg(src, "You have set the AOP to: " .. currentAOP);
       TriggerClientEvent('Badssentials:SetAOP', -1, currentAOP);
+
+      if Config.SetMapNameAsAOP then
+        SetMapName(currentAOP)
+      end
 
       if Config.AOPSystem.AOP_Announcement ~= nil then
         local aopAnnouncement = Config.AOPSystem.AOP_Announcement
@@ -111,41 +120,63 @@ RegisterCommand(Config.AOPSystem.AOPCommand, function(source, args, rawCommand)
     sendMsg(src, "^1ERROR: You do not have permission to change the AOP!");
   end
 end)
+
 timersRev = {}
 timersRes = {}
-Citizen.CreateThread(function()
-  while true do 
-    Wait((1000)); -- Each second 
-    for src, timer in pairs(timersRev) do 
-      timersRev[src] = timer - 1;
-      if (timersRev[src] <= 0) then 
-        timersRev[src] = nil;
-      end
-    end
-    for src, timer in pairs(timersRes) do 
-      timersRes[src] = timer - 1;
-      if (timersRes[src] <= 0) then 
-        timersRes[src] = nil;
-      end
-    end
-  end
-end)
 
 if Config.ReviveSystem.enable then
+  
+  AddEventHandler("txAdmin:events:healedPlayer", function(eventData)
+    local id = eventData.id
+    if id == -1 or id == "-1" then
+      timersRes = nil
+      timersRev = nil
+    else
+      timersRes[id] = nil
+      timersRev[id] = nil
+    end
+  end)
+
+  Citizen.CreateThread(function()
+    while true do 
+      Wait((1000)); -- Each second 
+      for src, timer in pairs(timersRev) do 
+        timersRev[src] = timer - 1;
+        if (timersRev[src] <= 0) then 
+          timersRev[src] = nil;
+        end
+      end
+      for src, timer in pairs(timersRes) do 
+        timersRes[src] = timer - 1;
+        if (timersRes[src] <= 0) then 
+          timersRes[src] = nil;
+        end
+      end
+    end
+  end)
+
   RegisterNetEvent("Badssentials:DeathTrigger")
   AddEventHandler("Badssentials:DeathTrigger", function()
     local src = source;
-    timersRev[src] = Config.ReviveSystem.Revive_Delay;
-    timersRes[src] = Config.ReviveSystem.Respawn_Delay;
+    if Config.ReviveSystem.EnablePEAIntergration[1] and exports["PoliceEMSActivity"]:IsPlayerOnDuty(src) then
+      timersRev[src] = Config.ReviveSystem.EnablePEAIntergration[2]
+      timersRes[src] = Config.ReviveSystem.EnablePEAIntergration[3]
+    else
+      timersRev[src] = Config.ReviveSystem.Revive_Delay;
+      timersRes[src] = Config.ReviveSystem.Respawn_Delay;
+    end
+    
   end)
+
   RegisterCommand(Config.ReviveSystem.ReviveCommand, function(source, args, rawCommand)
     local src = source;
     if #args == 0 or tonumber(args[1]) == src then 
       -- Revive themselves
       if timersRev[src] ~= nil and timersRev[src] >= 0 then 
         -- They are dead and have a timer 
-        if IsPlayerAceAllowed(src, Config.ReviveSystem.BypassReviveAcePermission) then 
+        if IsPlayerAceAllowed(src, Config.ReviveSystem.BypassReviveAcePermission) or IsPlayerInBypassArea(src) then 
           -- Can bypass reviving
+
           TriggerClientEvent('Badssentials:RevivePlayer', src);
         else 
           -- Cannot bypass reviving, send they need to wait and what their timer is at 
@@ -175,8 +206,12 @@ if Config.ReviveSystem.enable then
             local reviveMessage = Config.ReviveSystem.ReviveOthersMessage
             reviveMessage = reviveMessage:gsub("{PLAYER_NAME}", GetPlayerName(src))
 
+            local reviveOtherMessage = Config.ReviveSystem.ReviveOtherSuccessMessage
+            reviveOtherMessage = reviveOtherMessage:gsub("{PLAYER_NAME}", GetPlayerName(tonumber(args[1])))
+
             TriggerClientEvent('Badssentials:RevivePlayer', tonumber(args[1]));
-            sendMsg(src, "You have revived player ^5" .. GetPlayerName(tonumber(args[1])) .. " ^3successfully!");
+
+            sendMsg(src, reviveOtherMessage);
             sendMsg(tonumber(args[1]), reviveMessage);
           else
             --Player isn't online
@@ -186,7 +221,7 @@ if Config.ReviveSystem.enable then
           --Passed Arg is not integer
           sendMsg(src, "^1ERROR: You must specify a valid server ID!");
         end
-      else
+      else --No permission
         sendMsg(src, '^1ERROR: You do not have permission to revive others!');
       end
     end
@@ -197,7 +232,7 @@ if Config.ReviveSystem.enable then
       -- Respawn themselves
       if timersRes[src] ~= nil and timersRes[src] >= 0 then 
         -- They are dead and have a timer 
-        if IsPlayerAceAllowed(src, Config.ReviveSystem.BypassRespawnAcePermission) then 
+        if IsPlayerAceAllowed(src, Config.ReviveSystem.BypassRespawnAcePermission) or IsPlayerInBypassArea(src) then 
           -- Can bypass reviving
           TriggerClientEvent('Badssentials:RespawnPlayer', src);
         else 
@@ -286,7 +321,7 @@ function format_time(timestamp, format, tzoffset, tzname)
    elseif tzoffset:sub(1,1) == "+" then
       tzoffset = tzoffset:sub(2)
    end
-   tzoffset = sign * (tonumber(tzoffset:sub(1,2))*60 +
-tonumber(tzoffset:sub(3,4)))*60
+   tzoffset = sign * (tonumber(tzoffset:sub(1,2))*60 + tonumber(tzoffset:sub(3,4)))*60
+
    return os.date(format, timestamp + tzoffset)
 end

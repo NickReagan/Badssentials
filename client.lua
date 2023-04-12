@@ -118,7 +118,7 @@ if Config.ReviveSystem.enable then
 	Citizen.CreateThread(function()
 		while true do 
 			Wait(0);
-			local ped = GetPlayerPed(-1);
+			local ped = PlayerPedId()
 			if Config.ScreenAffects.DeathScreen then
 				if IsEntityDead(ped) then
 					--loops through all the Death Screen displays
@@ -132,16 +132,17 @@ if Config.ReviveSystem.enable then
 			end
 			if IsEntityDead(ped) and not deadCheck then
 				deadCheck = true;
+				SetPedCanRagdoll(ped, false)
 				TriggerServerEvent("Badssentials:DeathTrigger");
 			else 
 				if not IsEntityDead(ped) then 
 					deadCheck = false;
+					SetPedCanRagdoll(ped, true)
 					StopScreenEffect("DeathFailOut")
 				end 
 			end
 		end
 	end)
-
 	function revivePed(ped)
 		local playerPos = GetEntityCoords(ped, true)
 		isDead = false
@@ -151,7 +152,6 @@ if Config.ReviveSystem.enable then
 		ClearPedBloodDamage(ped)
 		deadCheck = false;
 	end
-
 	RegisterNetEvent('Badssentials:RevivePlayer')
 	AddEventHandler('Badssentials:RevivePlayer', function()
 		local ped = GetPlayerPed(-1);
@@ -160,11 +160,28 @@ if Config.ReviveSystem.enable then
 			TriggerEvent('chat:addMessage', {args = {Config.Prefix .. "Revived successfully!"} });
 		end
 	end)
-	
 	RegisterNetEvent('Badssentials:RespawnPlayer')
 	AddEventHandler('Badssentials:RespawnPlayer', function()
 		local ped = GetPlayerPed(-1);
 		if IsEntityDead(ped) then
+			local coords = Config.ReviveSystem.RespawnLocations[currentAOP] or Config.ReviveSystem.RespawnLocations.DefaultLocation
+
+			revivePed(ped);
+
+			if IsPedInAnyVehicle(ped, false) then
+				local vehicle = GetVehiclePedIsIn(ped, false)
+
+				TaskLeaveVehicle(ped, vehicle, 16)
+
+				Citizen.Wait(1)
+			end
+
+			SetEntityCoords(ped, coords.x, coords.y, coords.z, false, false, false, false);
+			SetEntityCoords(entity, xPos, yPos, zPos, xAxis, yAxis, zAxis, clearArea)
+
+			TriggerEvent('chat:addMessage', {args = {Config.Prefix .. Config.ReviveSystem.RespawnMessage} });
+			
+			--[[
 			local foundRespawnLocation = nil
 
 			--loops through respawn locations and finds one that matches current AOP
@@ -185,6 +202,9 @@ if Config.ReviveSystem.enable then
 				SetEntityCoords(entity, xPos, yPos, zPos, xAxis, yAxis, zAxis, clearArea)
 				TriggerEvent('chat:addMessage', {args = {Config.Prefix .. Config.ReviveSystem.ReviveMessage} });
 			end
+			]]
+
+
 		end
 	end)
 end
@@ -305,77 +325,77 @@ Citizen.CreateThread(function()
 	Wait(800);
 	while true do 
 		Wait(0);
-		local vehicle = GetVehiclePedIsIn(PlayerPedId())
-		speed = GetEntitySpeed(vehicle)
-
-		if peacetime then 
-			if IsControlPressed(0, 106) then
-                ShowInfo("~r~Peacetime is enabled. ~n~~s~You can not shoot.")
-            end
-            SetPlayerCanDoDriveBy(player, false)
-            DisablePlayerFiring(player, true)
-            DisableControlAction(0, 140) -- Melee R
-		end
-
-		for _, v in pairs(Config.Displays) do 
-			local x = v.x;
-			local y = v.y;
-			local enabled = v.enabled;
-			local scale = v.textScale;
-			local vehicleRestricted = v.vehicleRestricted;
-			if enabled and (not displaysHidden) then 
-				local disp = v.display;
-
-				if (disp:find("{NEAREST_POSTAL}") or disp:find("{NEAREST_POSTAL_DISTANCE}")) then 
-					disp = disp:gsub("{NEAREST_POSTAL}", postal);
-					disp = disp:gsub("{NEAREST_POSTAL_DISTANCE}", postalDist)
+		if not displaysHidden then
+			if peacetime then 
+				if IsControlPressed(0, 106) then
+					ShowInfo("~r~Peacetime is enabled. ~n~~s~You can not shoot.")
 				end
+				SetPlayerCanDoDriveBy(player, false)
+				DisablePlayerFiring(player, true)
+				DisableControlAction(0, 140) -- Melee R
+			end
 
-				if (disp:find("{STREET_NAME}")) then 
-					disp = disp:gsub("{STREET_NAME}", streetName);
-				end 
+			for _, v in pairs(Config.Displays) do 
+				local x = v.x;
+				local y = v.y;
+				local enabled = v.enabled;
+				local scale = v.textScale;
+				local vehicleRestricted = v.vehicleRestricted;
+				if enabled then 
+					local disp = v.display;
 
-				if (disp:find("{CITY}")) then 
-					disp = disp:gsub("{CITY}", zone);
-				end
-
-				if (disp:find("{COMPASS}")) then 
-					disp = disp:gsub("{COMPASS}", degree);
-				end
-
-				disp = disp:gsub("{ID}", id);
-				disp = disp:gsub("{EST_TIME}", currentTime);
-				disp = disp:gsub("{US_DAY}", currentDay);
-				disp = disp:gsub("{US_MONTH}", currentMonth);
-				disp = disp:gsub("{US_YEAR}", currentYear);
-				disp = disp:gsub("{CURRENT_AOP}", currentAOP);
-
-				if (disp:find("{PEACETIME_STATUS}")) then 
-					if peacetime then 
-						disp = disp:gsub("{PEACETIME_STATUS}", "~g~Enabled")
-					else 
-						disp = disp:gsub("{PEACETIME_STATUS}", "~r~Disabled")
+					if (disp:find("{NEAREST_POSTAL}") or disp:find("{NEAREST_POSTAL_DISTANCE}")) then 
+						disp = disp:gsub("{NEAREST_POSTAL}", postal);
+						disp = disp:gsub("{NEAREST_POSTAL_DISTANCE}", postalDist)
 					end
-				end
 
-				if vehicleRestricted and IsPedInAnyVehicle(PlayerPedId()) then
-					if (GetResourceState('LegacyFuel') == "started" or GetResourceState('LegacyFuel') == "starting") then
+					if (disp:find("{STREET_NAME}")) then 
+						disp = disp:gsub("{STREET_NAME}", streetName);
+					end 
+
+					if (disp:find("{CITY}")) then 
+						disp = disp:gsub("{CITY}", zone);
+					end
+
+					if (disp:find("{COMPASS}")) then 
+						disp = disp:gsub("{COMPASS}", degree);
+					end
+
+					disp = disp:gsub("{ID}", id);
+					disp = disp:gsub("{EST_TIME}", currentTime);
+					disp = disp:gsub("{US_DAY}", currentDay);
+					disp = disp:gsub("{US_MONTH}", currentMonth);
+					disp = disp:gsub("{US_YEAR}", currentYear);
+					disp = disp:gsub("{CURRENT_AOP}", currentAOP);
+
+					if (disp:find("{PEACETIME_STATUS}")) then 
+						if peacetime then 
+							disp = disp:gsub("{PEACETIME_STATUS}", "~g~Enabled")
+						else 
+							disp = disp:gsub("{PEACETIME_STATUS}", "~r~Disabled")
+						end
+					end
+
+					if vehicleRestricted and IsPedInAnyVehicle(PlayerPedId()) then
+						local vehicle = GetVehiclePedIsIn(PlayerPedId())
+						local speed = GetEntitySpeed(vehicle)
+
 						disp = disp:gsub("{SPEED_MPH}", math.ceil(speed * 2.236936));
 						disp = disp:gsub("{SPEED_KPH}", math.ceil(speed * 3.6));
 
-						if Config.Misc.usingLegacyFuel then
-							disp = disp:gsub("{FUEL}", math.ceil(exports.LegacyFuel:GetFuel(vehicle)));
-						end
+						if (GetResourceState('LegacyFuel') == "started" or GetResourceState('LegacyFuel') == "starting") then
+							if Config.Misc.usingLegacyFuel then
+								disp = disp:gsub("{FUEL}", math.ceil(exports.LegacyFuel:GetFuel(vehicle)));
+							end
 
-						Draw2DText(x, y, disp, scale, false);
-					else
-						disp = disp:gsub("{SPEED_MPH}", "~r~~h~Contact Development~w~");
-						disp = disp:gsub("{SPEED_KPH}", "~r~~h~Contact Development~w~");
-						disp = disp:gsub("{FUEL}", "~r~~h~Contact Development~w~");
+							Draw2DText(x, y, disp, scale, false);
+						else
+							disp = disp:gsub("{FUEL}", "~r~~h~Contact Development~w~");
+							Draw2DText(x, y, disp, scale, false);
+						end
+					elseif not vehicleRestricted then
 						Draw2DText(x, y, disp, scale, false);
 					end
-				elseif not vehicleRestricted then
-					Draw2DText(x, y, disp, scale, false);
 				end
 			end
 			tickDegree = tickDegree + 9.0;
