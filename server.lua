@@ -129,8 +129,8 @@ if Config.ReviveSystem.enable then
   AddEventHandler("txAdmin:events:healedPlayer", function(eventData)
     local id = eventData.id
     if id == -1 or id == "-1" then
-      timersRes = nil
-      timersRev = nil
+      timersRes = {}
+      timersRev = {}
     else
       timersRes[id] = nil
       timersRev[id] = nil
