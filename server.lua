@@ -102,6 +102,10 @@ RegisterCommand(Config.AOPSystem.AOPCommand, function(source, args, rawCommand)
       sendMsg(src, "You have set the AOP to: " .. currentAOP);
       TriggerClientEvent('Badssentials:SetAOP', -1, currentAOP);
 
+      if Config.AOPSystem.SendSoundOnAOPChange[1] then
+        TriggerClientEvent("Badssentials:PlaySound", -1, Config.AOPSystem.SendSoundOnAOPChange[2], Config.AOPSystem.SendSoundOnAOPChange[3])
+      end
+
       if Config.SetMapNameAsAOP then
         SetMapName(currentAOP)
       end
