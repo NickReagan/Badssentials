@@ -120,6 +120,14 @@ AddEventHandler('onClientMapStart', function()
 	Citizen.Wait(2500)
 	exports.spawnmanager:setAutoSpawn(false)
 	Citizen.Trace("RPRevive: Autospawn is disabled.")
+
+	if Config.AOPSystem.SendAOPMessageOnJoin[1] then
+		local message = Config.AOPSystem.SendAOPMessageOnJoin[2]
+
+		message = message:gsub("{AOP}", currentAOP)
+
+		TriggerEvent("chatMessage", Config.Prefix .. " " .. message)
+	end
 end)
 
 if Config.ReviveSystem.enable then

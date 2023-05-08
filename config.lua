@@ -42,9 +42,10 @@ Config = {
         AOPCommand = "aop",
         --Announcement sent to players when AOP is changed. Set to "", or nil, to disable.
         AOP_Announcement = "The AOP has changed to '{NEW_AOP}'. Finish your current scene(s) and head to {NEW_AOP}. ^1Failure to do so could lead to punishment!^0",
+        SendAOPMessageOnJoin = {true, "The AOP is currently '{AOP}' please change your ped and head there now."},
         AOP_AcePermission = "Badssentials.AOP", --The ace permission need to run the AOPCommand.
         SetMapNameAsAOP = true, --This will set the map name to the current aop. This affects the "map name" on the server list, etc.
-        SendSoundOnAOPChange = {true, "buttonchime", 1}, --Whether to play a sound to everyone when aop changes, the name of the file that will play, and the volume. Needs to be a .ogg file.
+        SendSoundOnAOPChange = {true, "buttonchime", .8}, --Whether to play a sound to everyone when aop changes, the name of the file that will play, and the volume. Needs to be a .ogg file.
     },
     ReviveSystem = {
         enable = true, --Enable/Disable Revive System
