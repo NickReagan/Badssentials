@@ -23,6 +23,28 @@ function IsDisplaysHidden()
 	return displaysHidden
 end
 
+RegisterNetEvent("Badssentials:AOPWarning")
+AddEventHandler("Badssentials:AOPWarning", function(table)
+	local wait = table.timetodisplay
+
+	Citizen.CreateThread(function()
+		while wait > 0 do
+			Wait(1000)
+
+			wait = wait - 1
+		end
+	end)
+
+	local text = table.text
+	text = text:gsub("{AOP}", currentAOP)
+
+	while wait > 0 do
+		Wait(0)
+
+		Draw2DText(table.x, table.y, text, table.scale, table.center)
+	end
+end)
+
 RegisterNetEvent("Badssentials:PlaySound")
 AddEventHandler("Badssentials:PlaySound", function(soundFile, soundVolume)
 	SendNUIMessage({

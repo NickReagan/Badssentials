@@ -125,6 +125,47 @@ RegisterCommand(Config.AOPSystem.AOPCommand, function(source, args, rawCommand)
   end
 end)
 
+if Config.AOPSystem.AOPWarningCommand.enable then
+  RegisterCommand(Config.AOPSystem.AOPWarningCommand.command, function(source, args)
+    local src = source
+    
+    if src == 0 or IsPlayerAceAllowed(src, Config.AOPSystem.AOPWarningCommand.acepermission) then
+      if #args ~= 0 and IsInt(args[1]) then
+        if IsPlayerOnline(args[1]) then
+          local target = args[1]
+          local targetName = GetPlayerName(target)
+
+          if Config.AOPSystem.AOPWarningCommand.sound[1] then
+            TriggerClientEvent("Badssentials:PlaySound", target, Config.AOPSystem.AOPWarningCommand.sound[2], Config.AOPSystem.AOPWarningCommand.sound[3])
+          end
+
+          TriggerClientEvent("Badssentials:AOPWarning", target, Config.AOPSystem.AOPWarningCommand.HUDText)
+
+          if src == 0 then
+            print("AOP Warning sent to " .. targetName .. ".")
+          else
+            TriggerClientEvent("chatMessage", src, Config.Prefix .. " AOP Warning sent to " .. targetName .. ".")
+          end
+        else
+          if src == 0 then
+            print("No player with that ID is online.")
+          else
+            TriggerClientEvent("chatMessage", src, Config.Prefix .. " No player with that ID is online.")
+          end
+        end
+      else
+        if src == 0 then
+          print("You must specify a valid player ID.")
+        else
+          TriggerClientEvent("chatMessage", src, Config.Prefix .. " You must specify a valid player ID.")
+        end
+      end
+    else
+      TriggerClientEvent("chatMessage", src, Config.Prefix .. " You do not have permission to run this command.")
+    end
+  end)
+end
+
 timersRev = {}
 timersRes = {}
 

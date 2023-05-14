@@ -1,5 +1,5 @@
 Config = {
-	Prefix = '^5[^1Badssentials^5] ^3',
+	Prefix = '^5[^1Badssentials^5] ^0',
 	ScreenAffects = {
 		AnnounceCommand = "announce",
         AcePermission = "Badssentials.Announce", --The ace permission need to run the AnnounceCommand.
@@ -46,6 +46,20 @@ Config = {
         AOP_AcePermission = "Badssentials.AOP", --The ace permission need to run the AOPCommand.
         SetMapNameAsAOP = true, --This will set the map name to the current aop. This affects the "map name" on the server list, etc.
         SendSoundOnAOPChange = {true, "buttonchime", .8}, --Whether to play a sound to everyone when aop changes, the name of the file that will play, and the volume. Needs to be a .ogg file.
+        AOPWarningCommand = {
+            enable = true,
+            command = "sendaopwarning",
+            acepermission = "Badssentials.AOPWarn",
+            sound = {true, "warningBeep", .8},
+            HUDText = {
+                timetodisplay = 10,
+                text = "~r~WARNING! ~w~You are out of AOP! Return to '{AOP}'. ~r~You are risking displinary actions.",
+                x = .5,
+                y = .12,
+                scale = .7,
+                center = true,
+            }, 
+        },
     },
     ReviveSystem = {
         enable = true, --Enable/Disable Revive System
