@@ -136,4 +136,8 @@ Available Exports;
 `exports['Badssentials'].GetPeaceTimeStatus()` | Returns the current status of peacetime.  (Server Side)
 `exports['Badssentials'].IsDisplaysHidden()` | Returns true/false on whether or not Displays are hidden. (Client Side)
 
+Events;
+
+"Badssentials:AOPChange" | Called when AOP is changed. This event doesn't handle any of the auctually aop change it is simply meant to be used as a intergration method for other developers. We reccommend adding a source check if this event is called to ensure someone is not trying to exploit this event.
+
 
