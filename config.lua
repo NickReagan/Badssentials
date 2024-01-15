@@ -1,5 +1,6 @@
 Config = {
 	Prefix = '^5[^1Badssentials^5] ^0',
+
 	ScreenAffects = {
 		AnnounceCommand = "announce",
         AcePermission = "Badssentials.Announce", --The ace permission need to run the AnnounceCommand.
@@ -37,8 +38,9 @@ Config = {
             },
         },
 	},
+
     AOPSystem = {
-        DefaultAOP = "Sandy Shores",
+        DefaultAOP = "Sandy Shores", -- Will be ignored if RandomAOPOnStart is set to true.
         AOPCommand = "aop",
         --Announcement sent to players when AOP is changed. Set to "", or nil, to disable.
         AOP_Announcement = "The AOP has changed to '{NEW_AOP}'. Finish your current scene(s) and head to {NEW_AOP}. ^1Failure to do so could lead to punishment!^0",
@@ -46,6 +48,7 @@ Config = {
         AOP_AcePermission = "Badssentials.AOP", --The ace permission need to run the AOPCommand.
         SetMapNameAsAOP = true, --This will set the map name to the current aop. This affects the "map name" on the server list, etc.
         SendSoundOnAOPChange = {true, "buttonchime", .8}, --Whether to play a sound to everyone when aop changes, the name of the file that will play, and the volume. Needs to be a .ogg file.
+        RandomAOPOnStart = {true, {"Sandy Shores", "Paleto Bay", "Mirror Park", "Downtown Free City"}}, -- If set to true it will pick a random value from the one's specified when the server starts.
         AOPWarningCommand = {
             enable = true,
             command = "sendaopwarning",
@@ -61,6 +64,7 @@ Config = {
             }, 
         },
     },
+
     ReviveSystem = {
         enable = true, --Enable/Disable Revive System
         enableBypassLocations = true,
@@ -76,10 +80,10 @@ Config = {
         ReviveErrorMessage = "^1ERROR: You cannot revive, you still have ^7{REVIVE_TIME_LEFT} ^1remaining...",
         ReviveOthersAcePermission = "Badssentials.Revive", --The ace permission required to revive other players.
         ReviveOthersMessage = "You have been revived by ^5{PLAYER_NAME}^0.", --Message sent to user after being revived by someone else. Use {PLAYER_NAME} for the staff member's name.
-        BypassReviveAcePermission = "Badssentials.Bypass.ReviveR", --The ace permission required to revive yourself with no cooldown.
-        BypassRespawnAcePermission = "Badssentials.Bypass.RespawnR", --The ace permission required to respawn with no cooldown.
+        BypassReviveAcePermission = "Badssentials.Bypass.Revive", --The ace permission required to revive yourself with no cooldown.
+        BypassRespawnAcePermission = "Badssentials.Bypass.Respawn", --The ace permission required to respawn with no cooldown.
         RespawnLocations = {
-            DefaultLocation = {
+            DefaultLocation = {  -- DO NOT REMOVE THE DEFUALT LOCATION
                 --Sandy Shores Medical Center
                 x = 1827.26,
                 y = 3693.58,
@@ -120,14 +124,16 @@ Config = {
             },
         },
     },
+
     Misc = {
         PostalCommand = "postal",
         ToggleHUDCommand = "togglehud",
         Peacetime = "peacetime", -- Peacetime & PT both control the peacetime system.
         PT = "pt",
         PeacetimeAcePermission = "FIRP.PeaceTime", --The ace permission required to run PT or Peacetime command.
-        usingLegacyFuel = false, --Whether or not to enable the {FUEL} placeholder. (MUST HAVE LegacyFuel INSTALLED!)
+        usingLegacyFuel = false, --Whether or not to enable the {FUEL} placeholder. (MUST HAVE LegacyFuel INSTALLED AND STARTED BEFORE BADSSENTIALS!)
     },
+    
     Displays = {
         ['Compass Location'] = {
             x = .16,

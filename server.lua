@@ -93,6 +93,11 @@ if Config.AOPSystem.SetMapNameAsAOP then
   end)
 end
 
+if Config.AOPSystem.RandomAOPOnStart[1] then
+  local aops = Config.AOPSystem.RandomAOPOnStart[2]
+  currentAOP = aops[math.random(1, #aops)] --Chooses random aop from config.
+end
+
 RegisterCommand(Config.AOPSystem.AOPCommand, function(source, args, rawCommand)
   local src = source;
   if IsPlayerAceAllowed(src, Config.AOPSystem.AOP_AcePermission) then 

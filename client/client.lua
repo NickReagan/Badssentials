@@ -61,6 +61,7 @@ header = Config.ScreenAffects.AnnouncementHeader;
 displayTime = Config.ScreenAffects.AnnounceDisplayTime;
 timer = 0;
 anns = {};
+
 RegisterNetEvent('Badssentials:Announce')
 AddEventHandler('Badssentials:Announce', function(msg)
 	timer = 0;
@@ -85,6 +86,7 @@ AddEventHandler('Badssentials:Announce', function(msg)
 		table.insert(anns, curAnn);
 	end
 end)
+
 function split(pString, pPattern)
    local Table = {}  -- NOTE: use {n = 0} in Lua-5.0
    local fpat = "(.-)" .. pPattern
@@ -103,6 +105,7 @@ function split(pString, pPattern)
    end
    return Table
 end
+
 Citizen.CreateThread(function()
 	while true do 
 		Citizen.Wait((1000)); -- Every second 
@@ -116,6 +119,7 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
+
 Citizen.CreateThread(function()
 	while true do 
 		Wait(0);
@@ -136,6 +140,7 @@ Citizen.CreateThread(function()
 		end
 	end
 end)
+
 AddEventHandler('onClientMapStart', function()
 	Citizen.Trace("RPRevive: Disabling le autospawn.")
 	exports.spawnmanager:spawnPlayer() -- Ensure player spawns into server.
@@ -182,6 +187,7 @@ if Config.ReviveSystem.enable then
 			end
 		end
 	end)
+
 	function revivePed(ped)
 		local playerPos = GetEntityCoords(ped, true)
 		isDead = false
@@ -191,6 +197,7 @@ if Config.ReviveSystem.enable then
 		ClearPedBloodDamage(ped)
 		deadCheck = false;
 	end
+
 	RegisterNetEvent('Badssentials:RevivePlayer')
 	AddEventHandler('Badssentials:RevivePlayer', function()
 		local ped = GetPlayerPed(-1);
@@ -199,6 +206,7 @@ if Config.ReviveSystem.enable then
 			TriggerEvent('chat:addMessage', {args = {Config.Prefix .. "Revived successfully!"} });
 		end
 	end)
+
 	RegisterNetEvent('Badssentials:RespawnPlayer')
 	AddEventHandler('Badssentials:RespawnPlayer', function()
 		local ped = GetPlayerPed(-1);
@@ -219,31 +227,23 @@ if Config.ReviveSystem.enable then
 			SetEntityCoords(entity, xPos, yPos, zPos, xAxis, yAxis, zAxis, clearArea)
 
 			TriggerEvent('chat:addMessage', {args = {Config.Prefix .. Config.ReviveSystem.RespawnMessage} });
-			
-			--[[
-			local foundRespawnLocation = nil
 
 			--loops through respawn locations and finds one that matches current AOP
 			for i, v in pairs(Config.ReviveSystem.RespawnLocations) do
 				if i == currentAOP then
-					foundRespawnLocation = true
 					revivePed(ped);
 					SetEntityCoords(ped, v.x, v.y, v.z, false, false, false, false);
 					SetEntityCoords(entity, xPos, yPos, zPos, xAxis, yAxis, zAxis, clearArea)
 					TriggerEvent('chat:addMessage', {args = {Config.Prefix .. Config.ReviveSystem.RespawnMessage} });
+					return
 				end
 			end
 
 			--sends player to defualt spawn location if currentAOP doesn't match when in the table.
-			if foundRespawnLocation ~= true then
-				revivePed(ped);
-				SetEntityCoords(ped, Config.ReviveSystem.RespawnLocations.DefaultLocation.x, Config.ReviveSystem.RespawnLocations.DefaultLocation.y, Config.ReviveSystem.RespawnLocations.DefaultLocation.z, false, false, false, false);
-				SetEntityCoords(entity, xPos, yPos, zPos, xAxis, yAxis, zAxis, clearArea)
-				TriggerEvent('chat:addMessage', {args = {Config.Prefix .. Config.ReviveSystem.ReviveMessage} });
-			end
-			]]
-
-
+			revivePed(ped);
+			SetEntityCoords(ped, Config.ReviveSystem.RespawnLocations.DefaultLocation.x, Config.ReviveSystem.RespawnLocations.DefaultLocation.y, Config.ReviveSystem.RespawnLocations.DefaultLocation.z, false, false, false, false);
+			SetEntityCoords(entity, xPos, yPos, zPos, xAxis, yAxis, zAxis, clearArea)
+			TriggerEvent('chat:addMessage', {args = {Config.Prefix .. Config.ReviveSystem.ReviveMessage} });
 		end
 	end)
 end
@@ -251,6 +251,7 @@ end
 tickDegree = 0;
 local nearest = nil;
 local postals = Postals;
+
 function round(num, numDecimalPlaces)
   if numDecimalPlaces and numDecimalPlaces>0 then
     local mult = 10^numDecimalPlaces
@@ -258,42 +259,56 @@ function round(num, numDecimalPlaces)
   end
   return math.floor(num + 0.5)
 end
+
 currentTime = "0:00";
+
 RegisterNetEvent('Badssentials:SetTime')
 AddEventHandler('Badssentials:SetTime', function(time)
 	currentTime = time;
 end)
+
 currentDay = 1;
+
 RegisterNetEvent('Badssentials:SetDay')
 AddEventHandler('Badssentials:SetDay', function(day)
 	currentDay = day;
 end)
+
 currentMonth = 1;
+
 RegisterNetEvent('Badssentials:SetMonth')
 AddEventHandler('Badssentials:SetMonth', function(month)
 	currentMonth = month;
 end)
+
 currentYear = "2021";
+
 RegisterNetEvent('Badssentials:SetYear')
 AddEventHandler('Badssentials:SetYear', function(year)
 	currentYear = year;
 end)
+
 peacetime = false;
+
 function ShowInfo(text)
 	SetNotificationTextEntry("STRING")
 	AddTextComponentString(text)
 	DrawNotification(true, false)
 end
+
 currentAOP = "Sandy Shores"
 RegisterNetEvent('Badssentials:SetAOP')
 AddEventHandler('Badssentials:SetAOP', function(aop)
 	currentAOP = aop;
 end)
+
 RegisterNetEvent('Badssentials:SetPT')
 AddEventHandler('Badssentials:SetPT', function(pt)
 	peacetime = pt;
 end)
+
 displaysHidden = false;
+
 RegisterCommand(Config.Misc.ToggleHUDCommand, function()
 	displaysHidden = not displaysHidden;
 	TriggerEvent('Badger-Priorities:HideDisplay')
@@ -319,6 +334,7 @@ RegisterCommand(Config.Misc.PostalCommand, function(source, args, raw)
 		TriggerEvent('chatMessage', Config.Prefix .. "Your waypoint has been reset!");
 	end
 end)
+
 function getPostalCoords(postal)
 	for _, v in pairs(postals) do 
 		if v.code == postal then 
@@ -327,11 +343,13 @@ function getPostalCoords(postal)
 	end
 	return nil;
 end
+
 zone = nil;
 streetName = nil;
 postal = nil;
 postalDist = nil;
 degree = nil;
+
 Citizen.CreateThread(function()
 	while true do 
 		Wait(150);
@@ -360,6 +378,7 @@ Citizen.CreateThread(function()
 		streetName = GetStreetNameFromHashKey(var1);
 	end 
 end)
+
 Citizen.CreateThread(function()
 	Wait(800);
 	while true do 
@@ -451,6 +470,7 @@ function GetCardinalDirection()
     tickDegree = tickDegree + tickDegreeRemainder
     return tickDegree;
 end
+
 function degreesToIntercardinalDirection( dgr )
 	dgr = dgr % 360.0
 	
