@@ -1,3 +1,5 @@
+exports.spawnmanager:setAutoSpawn(false)
+
 --------------------
 --- Badssentials ---
 --------------------
@@ -133,8 +135,25 @@ if Config.ReviveSystem.enable then
 			if IsEntityDead(ped) and not deadCheck then
 				deadCheck = true;
 				TriggerServerEvent("Badssentials:DeathTrigger");
+
+				if Config.ReviveSystem.MutePlayerWhileDead then
+					if GetResourceState("pma-voice") == "started" then
+						exports['pma-voice']:overrideProximityCheck(function()
+							-- This disables the player from "targeting" anyone when talking
+							return false
+						end)
+					end
+				end
 			else 
 				if not IsEntityDead(ped) then 
+					if Config.ReviveSystem.MutePlayerWhileDead then
+						if GetResourceState("pma-voice") == "started" then
+							--ensure pma-voice is started
+							exports['pma-voice']:resetProximityCheck()
+						else
+							Citizen.Trace("Badessentials: MutePlayerWhileDead is true while pma-voice is not started or found. Contact Development.")
+						end
+					end
 					deadCheck = false;
 					StopScreenEffect("DeathFailOut")
 				end 

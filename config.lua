@@ -15,7 +15,7 @@ Config = {
             {RESPAWN_COMMAND} | Returns the set respawn command.
             ]]
             ['Line 1'] = {
-                text = "~r~You are knocked out or dead...",
+                text = "~r~You are knocked out or dead and can not speak...",
                 x = .5,
                 y = .05,
                 scale = .8,
@@ -58,6 +58,7 @@ Config = {
         ReviveOthersMessage = "You have been revived by ^5{PLAYER_NAME}^0.", --Message sent to user after being revived by someone else. Use {PLAYER_NAME} for the staff member's name.
         BypassReviveAcePermission = "Badssentials.Bypass.Revive",
         BypassRespawnAcePermission = "Badssentials.Bypass.Respawn",
+        MutePlayerWhileDead = true, --REQUIRES PMA-VOICE: does not allow player to speak while downed/dead.
         RespawnLocations = {
             DefaultLocation = {
                 --Sandy Shores Medical Center
