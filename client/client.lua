@@ -407,6 +407,15 @@ Citizen.CreateThread(function()
 				if disp:find("{PEACETIME_STATUS}") then
 					disp = disp:gsub("{PEACETIME_STATUS}", peacetime and "~g~Enabled" or "~r~Disabled")
 				end
+				-- Game time placeholders (updated every 150ms, sufficient for in-game clock)
+				local gameHour = math.floor(GetClockHours()) % 24
+				local gameMinute = math.floor(GetClockMinutes()) % 60
+				disp = disp:gsub("{GAME_TIME}", string.sub(100 + gameHour, 2) .. ":" .. string.sub(100 + gameMinute, 2))
+				local days = {[0]="Sunday",[1]="Monday",[2]="Tuesday",[3]="Wednesday",[4]="Thursday",[5]="Friday",[6]="Saturday"}
+				disp = disp:gsub("{GAME_DAY_STRING}", days[GetClockDayOfWeek()])
+				disp = disp:gsub("{GAME_DAY}", GetClockDayOfMonth())
+				disp = disp:gsub("{GAME_MONTH}", GetClockMonth())
+				disp = disp:gsub("{GAME_YEAR}", GetClockYear())
 				cachedDisplayStrings[k] = disp
 			end
 		end

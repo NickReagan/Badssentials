@@ -147,6 +147,11 @@ Config = {
         {US_DAY} | Returns the current day.
         {US_MONTH} | Returns the current month.
         {US_YEAR} | Returns the current year.
+        {GAME_TIME} | Returns the current in-game time (HH:MM).
+        {GAME_DAY_STRING} | Returns the current in-game day as a string (Sunday, Monday, etc.)
+        {GAME_DAY} | Returns the current in-game day of the month.
+        {GAME_MONTH} | Returns the current in-game month.
+        {GAME_YEAR} | Returns the current in-game year.
         {CURRENT_AOP} | Returns the current AOP.
         {PEACETIME_STATUS} | Returns the current peacetime status.
         {SPEED_MPH} | Returns the player's speed in MPH. (vehicleRestricted must be true)
