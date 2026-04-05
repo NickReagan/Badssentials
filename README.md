@@ -196,23 +196,24 @@ Config = {
     }
 }
 ```
-Essentially, you can add as many watermarks, respawn locations, and bypass location to this configuration that you want just by following the format of the previous ones. The placeholders all in this configuration can be used as well. Currently only EST time is supported, but there may be more coming in the future (pull request maybe please? lol)...
+Essentially, you can add as many watermarks, respawn locations, and bypass locations to this configuration that you want just by following the format of the previous ones. All placeholders listed below can be used in any Display entry.
 
 Available Placeholders for Displays;
 {NEAREST_POSTAL} | Returns the nearest postal code of the player.
 {NEAREST_POSTAL_DISTANCE} | Returns the distance between the player and the nearest postal code.
 {STREET_NAME} | Returns the street name the player is on.
 {CITY} | Returns the name of the area the player is in.
-{COMPASS} | Returns the direction of travel of the player. N, E, S, W, etc.
+{COMPASS} | Returns the compass direction of the player. N, NE, E, SE, S, SW, W, NW.
 {ID} | Returns the server ID of the player.
-Note: All Times are returned as Eastern Standard Time.
-{EST_TIME} | Returns the current time.
+{SERVER_TIME} | Returns the current server local time in 12-hour format (e.g. 03:45 PM).
 {US_DAY} | Returns the current day.
 {US_MONTH} | Returns the current month.
-{US_YEAR} | Reutrns the current year.
-
+{US_YEAR} | Returns the current year.
 {CURRENT_AOP} | Returns the current AOP.
 {PEACETIME_STATUS} | Returns the current peacetime status.
+{SPEED_MPH} | Returns the player's speed in MPH. (vehicleRestricted must be true)
+{SPEED_KPH} | Returns the player's speed in KPH. (vehicleRestricted must be true)
+{FUEL} | Returns the vehicle's fuel level. (vehicleRestricted must be true, usingLegacyFuel must be true)
 
 Available Exports;
 

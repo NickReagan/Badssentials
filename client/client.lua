@@ -55,6 +55,7 @@ AddEventHandler("Badssentials:PlaySound", function(soundFile, soundVolume)
 end)
 
 id = GetPlayerServerId(PlayerId())
+local legacyFuelLoaded = (GetResourceState('LegacyFuel') == "started" or GetResourceState('LegacyFuel') == "starting")
 ann = nil;
 announcement = false;
 header = Config.ScreenAffects.AnnouncementHeader;
@@ -121,22 +122,23 @@ Citizen.CreateThread(function()
 end)
 
 Citizen.CreateThread(function()
-	while true do 
-		Wait(0);
-		if ann ~= nil and announcement then 
+	while true do
+		if ann ~= nil and announcement then
+			Wait(0);
 			-- 70 character limit per announcement using .8
 			local startCout = Config.ScreenAffects.AnnouncementPlacement;
 			Draw2DText(.5, startCout, header, 1.5, true);
-			--Draw2DText(.5, .5, ann, 0.8, true);
 			local cout = startCout + .1;
-			if #ann > 70 then 
-				for i = 1, #anns do 
+			if #ann > 70 then
+				for i = 1, #anns do
 					Draw2DText(.5, cout, anns[i], 0.8, true);
 					cout = cout + .05;
 				end
-			else 
+			else
 				Draw2DText(.5, cout, ann, 0.8, true);
 			end
+		else
+			Wait(200);
 		end
 	end
 end)
@@ -159,18 +161,25 @@ end)
 
 if Config.ReviveSystem.enable then
 	deadCheck = false;
+
+	-- Pre-compute death screen texts once
+	local cachedDeathScreenTexts = {}
+	for k, v in pairs(Config.ScreenAffects.DeathScreenDisplaySettings) do
+		local text = v.text
+		text = text:gsub("{REVIVE_COMMAND}", '/' .. Config.ReviveSystem.ReviveCommand)
+		text = text:gsub("{RESPAWN_COMMAND}", '/' .. Config.ReviveSystem.RespawnCommand)
+		cachedDeathScreenTexts[k] = text
+	end
+
 	Citizen.CreateThread(function()
-		while true do 
+		while true do
 			Wait(0);
 			local ped = PlayerPedId()
 			if Config.ScreenAffects.DeathScreen then
 				if IsEntityDead(ped) then
 					--loops through all the Death Screen displays
-					for _, v in pairs(Config.ScreenAffects.DeathScreenDisplaySettings) do
-						local text = v.text
-						text = text:gsub("{REVIVE_COMMAND}", '/' .. Config.ReviveSystem.ReviveCommand)
-						text = text:gsub("{RESPAWN_COMMAND}", '/' .. Config.ReviveSystem.RespawnCommand)
-						Draw2DText(v.x, v.y, text, v.scale, v.center)
+					for k, v in pairs(Config.ScreenAffects.DeathScreenDisplaySettings) do
+						Draw2DText(v.x, v.y, cachedDeathScreenTexts[k], v.scale, v.center)
 					end
 				end
 			end
@@ -350,8 +359,10 @@ postal = nil;
 postalDist = nil;
 degree = nil;
 
+local cachedDisplayStrings = {}
+
 Citizen.CreateThread(function()
-	while true do 
+	while true do
 		Wait(150);
 		local pos = GetEntityCoords(PlayerPedId())
 		local playerX, playerY = table.unpack(pos)
@@ -376,87 +387,74 @@ Citizen.CreateThread(function()
 		zone = GetLabelText(GetNameOfZone(pos.x, pos.y, pos.z));
 		degree = degreesToIntercardinalDirection(GetCardinalDirection());
 		streetName = GetStreetNameFromHashKey(var1);
-	end 
+
+		for k, v in pairs(Config.Displays) do
+			if v.enabled then
+				local disp = v.display
+				if disp:find("{NEAREST_POSTAL}") or disp:find("{NEAREST_POSTAL_DISTANCE}") then
+					disp = disp:gsub("{NEAREST_POSTAL}", postal)
+					disp = disp:gsub("{NEAREST_POSTAL_DISTANCE}", postalDist)
+				end
+				if disp:find("{STREET_NAME}") then disp = disp:gsub("{STREET_NAME}", streetName) end
+				if disp:find("{CITY}") then disp = disp:gsub("{CITY}", zone) end
+				if disp:find("{COMPASS}") then disp = disp:gsub("{COMPASS}", degree) end
+				disp = disp:gsub("{ID}", id)
+				disp = disp:gsub("{SERVER_TIME}", currentTime)
+				disp = disp:gsub("{US_DAY}", currentDay)
+				disp = disp:gsub("{US_MONTH}", currentMonth)
+				disp = disp:gsub("{US_YEAR}", currentYear)
+				disp = disp:gsub("{CURRENT_AOP}", currentAOP)
+				if disp:find("{PEACETIME_STATUS}") then
+					disp = disp:gsub("{PEACETIME_STATUS}", peacetime and "~g~Enabled" or "~r~Disabled")
+				end
+				cachedDisplayStrings[k] = disp
+			end
+		end
+	end
 end)
 
 Citizen.CreateThread(function()
 	Wait(800);
-	while true do 
+	while true do
 		Wait(0);
 		if not displaysHidden then
-			if peacetime then 
-				if IsControlPressed(0, 106) then
-					ShowInfo("~r~Peacetime is enabled. ~n~~s~You can not shoot.")
-				end
-				SetPlayerCanDoDriveBy(player, false)
-				DisablePlayerFiring(player, true)
-				DisableControlAction(0, 140) -- Melee R
-			end
-
-			for _, v in pairs(Config.Displays) do 
-				local x = v.x;
-				local y = v.y;
-				local enabled = v.enabled;
-				local scale = v.textScale;
-				local vehicleRestricted = v.vehicleRestricted;
-				if enabled then 
-					local disp = v.display;
-
-					if (disp:find("{NEAREST_POSTAL}") or disp:find("{NEAREST_POSTAL_DISTANCE}")) then 
-						disp = disp:gsub("{NEAREST_POSTAL}", postal);
-						disp = disp:gsub("{NEAREST_POSTAL_DISTANCE}", postalDist)
-					end
-
-					if (disp:find("{STREET_NAME}")) then 
-						disp = disp:gsub("{STREET_NAME}", streetName);
-					end 
-
-					if (disp:find("{CITY}")) then 
-						disp = disp:gsub("{CITY}", zone);
-					end
-
-					if (disp:find("{COMPASS}")) then 
-						disp = disp:gsub("{COMPASS}", degree);
-					end
-
-					disp = disp:gsub("{ID}", id);
-					disp = disp:gsub("{EST_TIME}", currentTime);
-					disp = disp:gsub("{US_DAY}", currentDay);
-					disp = disp:gsub("{US_MONTH}", currentMonth);
-					disp = disp:gsub("{US_YEAR}", currentYear);
-					disp = disp:gsub("{CURRENT_AOP}", currentAOP);
-
-					if (disp:find("{PEACETIME_STATUS}")) then 
-						if peacetime then 
-							disp = disp:gsub("{PEACETIME_STATUS}", "~g~Enabled")
-						else 
-							disp = disp:gsub("{PEACETIME_STATUS}", "~r~Disabled")
-						end
-					end
-
-					if vehicleRestricted and IsPedInAnyVehicle(PlayerPedId()) then
-						local vehicle = GetVehiclePedIsIn(PlayerPedId())
-						local speed = GetEntitySpeed(vehicle)
-
-						disp = disp:gsub("{SPEED_MPH}", math.ceil(speed * 2.236936));
-						disp = disp:gsub("{SPEED_KPH}", math.ceil(speed * 3.6));
-
-						if (GetResourceState('LegacyFuel') == "started" or GetResourceState('LegacyFuel') == "starting") then
-							if Config.Misc.usingLegacyFuel then
-								disp = disp:gsub("{FUEL}", math.ceil(exports.LegacyFuel:GetFuel(vehicle)));
+			for k, v in pairs(Config.Displays) do
+				if v.enabled then
+					local disp = cachedDisplayStrings[k]
+					if disp then
+						if v.vehicleRestricted and IsPedInAnyVehicle(PlayerPedId(), false) then
+							local vehicle = GetVehiclePedIsIn(PlayerPedId(), false)
+							local speed = GetEntitySpeed(vehicle)
+							disp = disp:gsub("{SPEED_MPH}", math.ceil(speed * 2.236936))
+							disp = disp:gsub("{SPEED_KPH}", math.ceil(speed * 3.6))
+							if legacyFuelLoaded and Config.Misc.usingLegacyFuel then
+								disp = disp:gsub("{FUEL}", math.ceil(exports.LegacyFuel:GetFuel(vehicle)))
+							else
+								disp = disp:gsub("{FUEL}", "~r~~h~Contact Development~w~")
 							end
-
-							Draw2DText(x, y, disp, scale, false);
-						else
-							disp = disp:gsub("{FUEL}", "~r~~h~Contact Development~w~");
-							Draw2DText(x, y, disp, scale, false);
+							Draw2DText(v.x, v.y, disp, v.textScale, false)
+						elseif not v.vehicleRestricted then
+							Draw2DText(v.x, v.y, disp, v.textScale, false)
 						end
-					elseif not vehicleRestricted then
-						Draw2DText(x, y, disp, scale, false);
 					end
 				end
 			end
 			tickDegree = tickDegree + 9.0;
+		end
+	end
+end)
+
+Citizen.CreateThread(function()
+	local localPlayer = PlayerId()
+	while true do
+		Wait(100)
+		if peacetime and not displaysHidden then
+			if IsControlPressed(0, 106) then
+				ShowInfo("~r~Peacetime is enabled. ~n~~s~You can not shoot.")
+			end
+			SetPlayerCanDoDriveBy(localPlayer, false)
+			DisablePlayerFiring(localPlayer, true)
+			DisableControlAction(0, 140, true) -- Melee R
 		end
 	end
 end)

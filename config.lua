@@ -135,6 +135,24 @@ Config = {
     },
     
     Displays = {
+        --[[
+        Available Placeholders;
+        {NEAREST_POSTAL} | Returns the nearest postal code of the player.
+        {NEAREST_POSTAL_DISTANCE} | Returns the distance to the nearest postal code.
+        {STREET_NAME} | Returns the street name the player is on.
+        {CITY} | Returns the name of the area the player is in.
+        {COMPASS} | Returns the compass direction of the player (N, NE, E, etc.)
+        {ID} | Returns the server ID of the player.
+        {SERVER_TIME} | Returns the current server local time (12-hour format).
+        {US_DAY} | Returns the current day.
+        {US_MONTH} | Returns the current month.
+        {US_YEAR} | Returns the current year.
+        {CURRENT_AOP} | Returns the current AOP.
+        {PEACETIME_STATUS} | Returns the current peacetime status.
+        {SPEED_MPH} | Returns the player's speed in MPH. (vehicleRestricted must be true)
+        {SPEED_KPH} | Returns the player's speed in KPH. (vehicleRestricted must be true)
+        {FUEL} | Returns the vehicle's fuel level. (vehicleRestricted must be true, usingLegacyFuel must be true)
+        ]]
         ['Compass Location'] = {
             x = .16,
             y = .889,

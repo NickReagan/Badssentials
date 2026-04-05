@@ -52,34 +52,42 @@ RegisterCommand(Config.ScreenAffects.AnnounceCommand, function(source, args, raw
   end
 end)
 
+-- Send date once (month/day/year don't change mid-session)
+local function broadcastDate()
+  TriggerClientEvent('Badssentials:SetMonth', -1, os.date("%m"))
+  TriggerClientEvent('Badssentials:SetDay', -1, os.date("%d"))
+  TriggerClientEvent('Badssentials:SetYear', -1, os.date("%Y"))
+end
+broadcastDate()
+
+local lastBroadcastTime = ""
+
+-- Broadcast server local time only when it actually changes (once per minute at most)
 Citizen.CreateThread(function()
-  while true do 
-    Wait(1000);
-    TriggerClientEvent('Badssentials:SetAOP', -1, currentAOP);
-    TriggerClientEvent('Badssentials:SetPT', -1, peacetime);
-
-    local time = format_time(os.time(), "%H:%M", "+05:00", "");
-    local date = format_time(os.time(), "%m %d %Y", "local", "");
-    local timeHour = split(time, ":")[1]
-    local dateData = split(date, " ");
-
-    TriggerClientEvent('Badssentials:SetMonth', -1, dateData[1])
-    TriggerClientEvent('Badssentials:SetDay', -1, dateData[2])
-    TriggerClientEvent('Badssentials:SetYear', -1, dateData[3])
-
-    if tonumber(timeHour) > 12 then 
-      local timeStr = tostring(tonumber(timeHour) - 12) .. ":" .. split(time, ":")[2]
-      TriggerClientEvent('Badssentials:SetTime', -1, timeStr);
+  while true do
+    Wait(1000)
+    local timeStr = os.date("%I:%M %p") -- server local 12-hour time, e.g. "03:45 PM"
+    if timeStr ~= lastBroadcastTime then
+      lastBroadcastTime = timeStr
+      TriggerClientEvent('Badssentials:SetTime', -1, timeStr)
     end
+  end
+end)
 
-    if timeHour == "00" then 
-      local timeStr = "12" .. ":" .. split(time, ":")[2]
-      TriggerClientEvent('Badssentials:SetTime', -1, timeStr);
-    end 
+-- Rebroadcast date once per hour as safety net for long sessions
+Citizen.CreateThread(function()
+  while true do
+    Wait(3600000)
+    broadcastDate()
+  end
+end)
 
-    if timeHour ~= "00" and tonumber(timeHour) <= 12 then 
-      TriggerClientEvent('Badssentials:SetTime', -1, time);
-    end
+-- AOP/PT fallback for late joiners (already sent immediately on command change)
+Citizen.CreateThread(function()
+  while true do
+    Wait(30000)
+    TriggerClientEvent('Badssentials:SetAOP', -1, currentAOP)
+    TriggerClientEvent('Badssentials:SetPT', -1, peacetime)
   end
 end)
 peacetime = false;
