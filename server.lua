@@ -241,6 +241,7 @@ if Config.ReviveSystem.enable then
           -- Can bypass reviving
 
           TriggerClientEvent('Badssentials:RevivePlayer', src);
+          TriggerClientEvent('visn_are:resetHealthBuffer', src)
         else 
           -- Cannot bypass reviving, send they need to wait and what their timer is at 
           local timeLeft = timersRev[src]
@@ -257,7 +258,8 @@ if Config.ReviveSystem.enable then
         end
       else 
         -- Their timer is expired or not valid 
-        TriggerClientEvent('Badssentials:RevivePlayer', src); 
+        TriggerClientEvent('Badssentials:RevivePlayer', src);
+        TriggerClientEvent('visn_are:resetHealthBuffer', src) 
       end
     else 
       -- They are reviving someone else 

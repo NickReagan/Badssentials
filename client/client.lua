@@ -261,14 +261,6 @@ tickDegree = 0;
 local nearest = nil;
 local postals = Postals;
 
-function round(num, numDecimalPlaces)
-  if numDecimalPlaces and numDecimalPlaces>0 then
-    local mult = 10^numDecimalPlaces
-    return math.floor(num * mult + 0.5) / mult
-  end
-  return math.floor(num + 0.5)
-end
-
 currentTime = "0:00";
 
 RegisterNetEvent('Badssentials:SetTime')
@@ -344,15 +336,6 @@ RegisterCommand(Config.Misc.PostalCommand, function(source, args, raw)
 	end
 end)
 
-function getPostalCoords(postal)
-	for _, v in pairs(postals) do 
-		if v.code == postal then 
-			return {x=v.x, y=v.y};
-		end
-	end
-	return nil;
-end
-
 zone = nil;
 streetName = nil;
 postal = nil;
@@ -365,24 +348,9 @@ Citizen.CreateThread(function()
 	while true do
 		Wait(150);
 		local pos = GetEntityCoords(PlayerPedId())
-		local playerX, playerY = table.unpack(pos)
-		local ndm = -1 -- nearest distance magnitude
-		local ni = -1 -- nearest index
-		for i, p in ipairs(postals) do
-			local dm = (playerX - p.x) ^ 2 + (playerY - p.y) ^ 2 -- distance magnitude
-			if ndm == -1 or dm < ndm then
-				ni = i
-				ndm = dm
-			end
-		end
 
-		--setting the nearest
-		if ni ~= -1 then
-			local nd = math.sqrt(ndm) -- nearest distance
-			nearest = {i = ni, d = nd}
-		end
-		postal = postals[nearest.i].code;
-		postalDist = round(nearest.d, 2);
+		local postal, postalDist = NearestPostal(pos)
+		
 		local var1, var2 = GetStreetNameAtCoord(pos.x, pos.y, pos.z, Citizen.ResultAsInteger(), Citizen.ResultAsInteger())
 		zone = GetLabelText(GetNameOfZone(pos.x, pos.y, pos.z));
 		degree = degreesToIntercardinalDirection(GetCardinalDirection());
@@ -407,6 +375,12 @@ Citizen.CreateThread(function()
 				if disp:find("{PEACETIME_STATUS}") then
 					disp = disp:gsub("{PEACETIME_STATUS}", peacetime and "~g~Enabled" or "~r~Disabled")
 				end
+
+				local ok, civName = pcall(function()
+					return exports["imperial-phone-sync"]:GetCivName()
+				end)
+				disp = disp:gsub("{IMPERIAL_CIV_NAME}", (ok and civName) or "None")
+
 				-- Game time placeholders (updated every 150ms, sufficient for in-game clock)
 				local gameHour = math.floor(GetClockHours()) % 24
 				local gameMinute = math.floor(GetClockMinutes()) % 60

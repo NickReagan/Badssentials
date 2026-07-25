@@ -1,13 +1,12 @@
 Config = {
-	Prefix = '^5[^1Badssentials^5] ^0',
-
+	Prefix = '^* ^7[^4FIRP^7] ^7',
 	ScreenAffects = {
 		AnnounceCommand = "announce",
-        AcePermission = "Badssentials.Announce", --The ace permission need to run the AnnounceCommand.
-		AnnouncementHeader = '~b~[~p~Announcement~b~]',
+        AcePermission = "FIRP.Announce", --The ace permission need to run the AnnounceCommand.
+		AnnouncementHeader = 'b~[~p~FIRP Announcement~b~]',
 		AnnouncementPlacement = 0, -- Set to 0 for top or .3 for middle of screen
 		AnnounceDisplayTime = 15, -- How many seconds should announcements display for?
-		DeathScreen = true, -- Enable/Disable the death screen. (Enabled by default.) (ReviveSystem.enable must also be true!)
+		DeathScreen = false, -- Enable/Disable the death screen. (Enabled by default.) (ReviveSystem.enable must also be true!)
         DeathScreenDisplaySettings = { 
             --[[
             Display used when DeathScreen = true
@@ -38,22 +37,19 @@ Config = {
             },
         },
 	},
-
     AOPSystem = {
-        DefaultAOP = "Sandy Shores", -- Will be ignored if RandomAOPOnStart is set to true.
+        DefaultAOP = "Sandy Shores",
         AOPCommand = "aop",
-        --Announcement sent to players when AOP is changed. Set to "", or nil, to disable.
+        --Announcement sent to players when AOP is changed. Set to "", or nil to disable.
         AOP_Announcement = "The AOP has changed to '{NEW_AOP}'. Finish your current scene(s) and head to {NEW_AOP}. ^1Failure to do so could lead to punishment!^0",
-        SendAOPMessageOnJoin = {true, "The AOP is currently '{AOP}' please change your ped and head there now."},
-        AOP_AcePermission = "Badssentials.AOP", --The ace permission need to run the AOPCommand.
-        SetMapNameAsAOP = true, --This will set the map name to the current aop. This affects the "map name" on the server list, etc.
-        SendSoundOnAOPChange = {true, "buttonchime", .8}, --Whether to play a sound to everyone when aop changes, the name of the file that will play, and the volume. Needs to be a .ogg file.
-        RandomAOPOnStart = {true, {"Sandy Shores", "Paleto Bay", "Mirror Park", "Downtown Free City"}}, -- If set to true it will pick a random value from the one's specified when the server starts.
+        SendAOPMessageOnJoin = {false, "The AOP is currently '{AOP}' please change your ped and head there now."},
+        AOP_AcePermission = "FIRP.AOP", --The ace permission need to run the AOPCommand.
+        SendSoundOnAOPChange = {true, "buttonchime", .7}, --Whether to play a sound to everyone when aop changes, the name of the file that will play, and the volume. Needs to be a .ogg file.
         AOPWarningCommand = {
             enable = true,
             command = "sendaopwarning",
-            acepermission = "Badssentials.AOPWarn",
-            sound = {true, "warningBeep", .8},
+            acepermission = "FIRP.AOPWarn",
+            sound = {true, "warningBeep", .7},
             HUDText = {
                 timetodisplay = 10,
                 text = "~r~WARNING! ~w~You are out of AOP! Return to '{AOP}'. ~r~You are risking displinary actions.",
@@ -63,8 +59,8 @@ Config = {
                 center = true,
             }, 
         },
+        RandomAOPOnStart = {false, {"Sandy Shores"}},
     },
-
     ReviveSystem = {
         enable = true, --Enable/Disable Revive System
         enableBypassLocations = true,
@@ -78,16 +74,16 @@ Config = {
         ReviveMessage = "Revived successfully!", --Message sent when player revives.
         ReviveOtherSuccessMessage = "You have revived player ^5{PLAYER_NAME} ^0successfully!", --Message sent to player when they successfully revived someone else.
         ReviveErrorMessage = "^1ERROR: You cannot revive, you still have ^7{REVIVE_TIME_LEFT} ^1remaining...",
-        ReviveOthersAcePermission = "Badssentials.Revive", --The ace permission required to revive other players.
+        ReviveOthersAcePermission = "FIRP.Revive",
         ReviveOthersMessage = "You have been revived by ^5{PLAYER_NAME}^0.", --Message sent to user after being revived by someone else. Use {PLAYER_NAME} for the staff member's name.
-        BypassReviveAcePermission = "Badssentials.Bypass.Revive", --The ace permission required to revive yourself with no cooldown.
-        BypassRespawnAcePermission = "Badssentials.Bypass.Respawn", --The ace permission required to respawn with no cooldown.
+        BypassReviveAcePermission = "FIRP.Bypass.Revive",
+        BypassRespawnAcePermission = "FIRP.Bypass.Respawn",
         RespawnLocations = {
-            DefaultLocation = {  -- DO NOT REMOVE THE DEFUALT LOCATION
-                --Sandy Shores Medical Center
-                x = 1827.26,
-                y = 3693.58,
-                z = 34.22,
+            DefaultLocation = {
+                --Paleto Bay Medical Center
+                x = -248.1,
+                y = 6332.6,
+                z = 32.43,
             },
             ['Los Santos'] = {
                 --Pillbox Hill Medical Center
@@ -115,7 +111,7 @@ Config = {
             },
         },
 
-        BypassLocations = { --Locations where players can revive/respawn without the timer, regardless of permissions.
+        BypassLocations = { --Locations where players can revive/respawn without the timer.
             ['LEO Training Center'] = {
                 x = -2079.86,
                 y = 3057.49,
@@ -124,47 +120,30 @@ Config = {
             },
         },
     },
-
     Misc = {
         PostalCommand = "postal",
         ToggleHUDCommand = "togglehud",
         Peacetime = "peacetime", -- Peacetime & PT both control the peacetime system.
         PT = "pt",
         PeacetimeAcePermission = "FIRP.PeaceTime", --The ace permission required to run PT or Peacetime command.
-        usingLegacyFuel = false, --Whether or not to enable the {FUEL} placeholder. (MUST HAVE LegacyFuel INSTALLED AND STARTED BEFORE BADSSENTIALS!)
+        usingLegacyFuel = true, --Whether or not to enable the {FUEL} placeholder. (MUST HAVE LegacyFuel INSTALLED!)
     },
-    
     Displays = {
-        --[[
-        Available Placeholders;
-        {NEAREST_POSTAL} | Returns the nearest postal code of the player.
-        {NEAREST_POSTAL_DISTANCE} | Returns the distance to the nearest postal code.
-        {STREET_NAME} | Returns the street name the player is on.
-        {CITY} | Returns the name of the area the player is in.
-        {COMPASS} | Returns the compass direction of the player (N, NE, E, etc.)
-        {ID} | Returns the server ID of the player.
-        {SERVER_TIME} | Returns the current server local time (12-hour format).
-        {US_DAY} | Returns the current day.
-        {US_MONTH} | Returns the current month.
-        {US_YEAR} | Returns the current year.
-        {GAME_TIME} | Returns the current in-game time (HH:MM).
-        {GAME_DAY_STRING} | Returns the current in-game day as a string (Sunday, Monday, etc.)
-        {GAME_DAY} | Returns the current in-game day of the month.
-        {GAME_MONTH} | Returns the current in-game month.
-        {GAME_YEAR} | Returns the current in-game year.
-        {CURRENT_AOP} | Returns the current AOP.
-        {PEACETIME_STATUS} | Returns the current peacetime status.
-        {SPEED_MPH} | Returns the player's speed in MPH. (vehicleRestricted must be true)
-        {SPEED_KPH} | Returns the player's speed in KPH. (vehicleRestricted must be true)
-        {FUEL} | Returns the vehicle's fuel level. (vehicleRestricted must be true, usingLegacyFuel must be true)
-        ]]
+        ['Active Imperial Civ'] = {
+            x = .16,
+            y = .87,
+            display = "~w~Current Character: ~b~ {IMPERIAL_CIV_NAME}",
+            textScale = .45,
+            vehicleRestricted = false,
+            enabled = true
+        },
         ['Compass Location'] = {
             x = .16,
             y = .889,
             display = "~w~| ~b~{COMPASS} ~w~|",
             textScale = 0.9,
             vehicleRestricted = false,
-            enabled = true,
+            enabled = true
         },
         ['Street Location'] = {
             x = .205,
@@ -172,23 +151,23 @@ Config = {
             display = "~w~| ~b~{STREET_NAME} ~w~|",
             textScale = .55,
             vehicleRestricted = false,
-            enabled = true,
+            enabled = true
         },
         ['Nearest Postal, Discord, & ID'] = {
             x = .16,
             y = .935,
-            display = "~b~Nearest Postal:~w~ {NEAREST_POSTAL} ~w~| ~b~Discord.gg: ~w~YOURINVITECODE ~w~| ~b~ID: ~w~{ID}",
+            display = "~b~Nearest Postal:~w~ {NEAREST_POSTAL} ~w~| ~b~Discord.gg: ~w~firp ~w~| ~b~ID: ~w~{ID}",
             textScale = .45,
             vehicleRestricted = false,
-            enabled = true,
+            enabled = true
         },
-        ['AOP & PeaceTime'] = {
+        ['AOP, PeaceTime, and Speed Limit'] = {
             x = .16,
             y = .96,
             display = "~b~Current AOP:~w~ {CURRENT_AOP} ~w~| ~b~PeaceTime: ~w~{PEACETIME_STATUS}",
             textScale = .45,
             vehicleRestricted = false,
-            enabled = true,
+            enabled = true
         },
         ['Speed & Fuel'] = {
             x = .0475,
@@ -196,7 +175,7 @@ Config = {
             display = "~w~{SPEED_MPH} ~b~MPH ~w~| ~b~Fuel: ~w~{FUEL}",
             textScale = .55,
             vehicleRestricted = true,
-            enabled = true,
+            enabled = true
         },
     }
 }

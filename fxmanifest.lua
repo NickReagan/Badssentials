@@ -1,15 +1,11 @@
-author "badger.jar"
+author "Badger#0002"
 description "Badssenstials"
 fx_version "cerulean"
 game "gta5"
-version '3.0.0'
 
 client_script "client/client.lua"
 
-server_scripts {
-    "server.lua",
-    "version-checker.lua"
-} 
+server_script "server.lua"
 
 shared_scripts {
     "config.lua",
@@ -20,7 +16,8 @@ shared_scripts {
 exports {
     "GetAOP",
     "GetPeaceTimeStatus",
-    "IsDisplaysHidden"
+    "IsDisplaysHidden",
+    "NearestPostal"
 }
 
 -- NUI Default Page
